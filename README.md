@@ -60,7 +60,7 @@ STEP 4 — Create SeaTunnel job file (inside host machine)
 
 Path on host:
 
-./seatunnel/jobs/oracle_payments.conf
+./seatunnel/jobs/oracle_to_oracle.conf
 
 Make sure the JDBC driver exists at:
 
