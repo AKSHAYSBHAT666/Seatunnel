@@ -37,15 +37,21 @@ docker exec -it oracle1 sqlplus system/OraclePwd1@FREEPDB1
 
 Run:
 
-CREATE TABLE payments (
-    id NUMBER PRIMARY KEY,
-    amount NUMBER,
-    status VARCHAR2(20)
+CREATE TABLE PAYMENTS (
+    ID            NUMBER PRIMARY KEY,
+    AMOUNT        NUMBER(10,2),
+    PAYEE         VARCHAR2(100),
+    PAYMENT_DATE  DATE
 );
 
-INSERT INTO payments VALUES (1, 1000, 'PAID');
-INSERT INTO payments VALUES (2, 2500, 'FAILED');
-INSERT INTO payments VALUES (3, 900,  'PROCESSING');
+INSERT INTO PAYMENTS (ID, AMOUNT, PAYEE, PAYMENT_DATE)
+VALUES (1, 100.50, 'Alice', TO_DATE('2024-11-01', 'YYYY-MM-DD'));
+
+INSERT INTO PAYMENTS (ID, AMOUNT, PAYEE, PAYMENT_DATE)
+VALUES (2, 250.00, 'Bob', TO_DATE('2024-11-15', 'YYYY-MM-DD'));
+
+INSERT INTO PAYMENTS (ID, AMOUNT, PAYEE, PAYMENT_DATE)
+VALUES (3, 75.25, 'Charlie', TO_DATE('2024-11-20', 'YYYY-MM-DD'));
 
 COMMIT;
 EXIT;
@@ -55,38 +61,6 @@ STEP 4 — Create SeaTunnel job file (inside host machine)
 Path on host:
 
 ./seatunnel/jobs/oracle_payments.conf
-
-
-Content:
-
-env {
-  parallelism = 1
-  job.mode = "BATCH"
-}
-
-source {
-  Jdbc {
-    url = "jdbc:oracle:thin:@oracle1:1521/FREEPDB1"
-    driver = "oracle.jdbc.OracleDriver"
-    user = "SYSTEM"
-    password = "OraclePwd1"
-    query = "SELECT id, amount, status FROM payments"
-  }
-}
-
-sink {
-  Jdbc {
-    url = "jdbc:oracle:thin:@oracle2:1521/FREEPDB1"
-    driver = "oracle.jdbc.OracleDriver"
-    user = "SYSTEM"
-    password = "OraclePwd2"
-    table = "payments"
-    generate_sink_sql = true
-    database = "FREEPDB1"
-    primary_keys = ["id"]
-  }
-}
-
 
 Make sure the JDBC driver exists at:
 
